@@ -12,7 +12,7 @@ gui.ResetOnSpawn = false
 gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 300, 0, 250)
+frame.Size = UDim2.new(0, 300, 0, 300)
 frame.Position = UDim2.new(0, 20, 0.3, 0)
 frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 frame.BorderSizePixel = 0
@@ -43,6 +43,18 @@ uiListLayout.Parent = playerList
 uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 uiListLayout.Padding = UDim.new(0, 5)
 
+-- Nút Refresh Danh Sách
+local refreshButton = Instance.new("TextButton")
+refreshButton.Size = UDim2.new(1, -20, 0, 30)
+refreshButton.Position = UDim2.new(0, 10, 0, 195)
+refreshButton.BackgroundColor3 = Color3.fromRGB(100, 100, 200)
+refreshButton.TextColor3 = Color3.new(1, 1, 1)
+refreshButton.Text = "🔄 Refresh Danh Sách"
+refreshButton.Font = Enum.Font.SourceSansBold
+refreshButton.TextSize = 16
+refreshButton.Parent = frame
+
+-- Nút Bật/Tắt Dịch Chuyển
 local toggleButton = Instance.new("TextButton")
 toggleButton.Size = UDim2.new(1, -20, 0, 40)
 toggleButton.Position = UDim2.new(0, 10, 1, -60)
@@ -53,6 +65,7 @@ toggleButton.Font = Enum.Font.SourceSansBold
 toggleButton.TextSize = 18
 toggleButton.Parent = frame
 
+-- Nút Đóng GUI
 local closeButton = Instance.new("TextButton")
 closeButton.Size = UDim2.new(1, -20, 0, 30)
 closeButton.Position = UDim2.new(0, 10, 1, -25)
@@ -63,9 +76,8 @@ closeButton.Font = Enum.Font.SourceSansBold
 closeButton.TextSize = 18
 closeButton.Parent = frame
 
--- Hàm update danh sách người chơi
+-- Hàm cập nhật danh sách người chơi
 local function updatePlayerList()
-    -- Xóa các nút cũ
     for _, child in pairs(playerList:GetChildren()) do
         if child:IsA("TextButton") then
             child:Destroy()
@@ -90,17 +102,22 @@ local function updatePlayerList()
         end
     end
 
-    -- Update canvas size cho scrolling frame
     local layout = playerList:FindFirstChildOfClass("UIListLayout")
     if layout then
         playerList.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 10)
     end
 end
 
--- Gọi lần đầu
+-- Gọi khi mới vào
 updatePlayerList()
 
--- Nút bật tắt dịch chuyển
+-- Sự kiện nút Refresh
+refreshButton.MouseButton1Click:Connect(function()
+    updatePlayerList()
+    print("Đã làm mới danh sách người chơi.")
+end)
+
+-- Nút bật/tắt dịch chuyển
 toggleButton.MouseButton1Click:Connect(function()
     if teleportEnabled then
         teleportEnabled = false
@@ -126,18 +143,17 @@ closeButton.MouseButton1Click:Connect(function()
     print("Đã đóng GUI.")
 end)
 
--- Update liên tục dịch chuyển nếu bật
+-- Dịch chuyển liên tục
 RunService.RenderStepped:Connect(function()
     if teleportEnabled and targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
         local targetPos = targetPlayer.Character.HumanoidRootPart.CFrame
         local character = LocalPlayer.Character
         if character and character:FindFirstChild("HumanoidRootPart") then
-            -- Teleport local player tới vị trí HumanoidRootPart của người mục tiêu
             character.HumanoidRootPart.CFrame = targetPos * CFrame.new(0, 3, 0)
         end
     end
 end)
 
--- Update danh sách khi có người chơi mới vào hoặc ra
+-- Tự động cập nhật khi người chơi vào/ra
 Players.PlayerAdded:Connect(updatePlayerList)
 Players.PlayerRemoving:Connect(updatePlayerList)
