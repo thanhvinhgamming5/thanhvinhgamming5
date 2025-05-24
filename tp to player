@@ -12,7 +12,7 @@ gui.ResetOnSpawn = false
 gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 300, 0, 300)
+frame.Size = UDim2.new(0, 300, 0, 350)
 frame.Position = UDim2.new(0, 20, 0.3, 0)
 frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 frame.BorderSizePixel = 0
@@ -54,13 +54,24 @@ refreshButton.Font = Enum.Font.SourceSansBold
 refreshButton.TextSize = 16
 refreshButton.Parent = frame
 
--- Nút Bật/Tắt Dịch Chuyển
+-- Nút dịch chuyển 1 lần
+local teleportOnceButton = Instance.new("TextButton")
+teleportOnceButton.Size = UDim2.new(1, -20, 0, 40)
+teleportOnceButton.Position = UDim2.new(0, 10, 1, -110)
+teleportOnceButton.BackgroundColor3 = Color3.fromRGB(80, 160, 80)
+teleportOnceButton.TextColor3 = Color3.new(1, 1, 1)
+teleportOnceButton.Text = "Dịch chuyển 1 lần"
+teleportOnceButton.Font = Enum.Font.SourceSansBold
+teleportOnceButton.TextSize = 18
+teleportOnceButton.Parent = frame
+
+-- Nút bật/tắt dịch chuyển liên tục
 local toggleButton = Instance.new("TextButton")
 toggleButton.Size = UDim2.new(1, -20, 0, 40)
 toggleButton.Position = UDim2.new(0, 10, 1, -60)
 toggleButton.BackgroundColor3 = Color3.fromRGB(60, 180, 60)
 toggleButton.TextColor3 = Color3.new(1, 1, 1)
-toggleButton.Text = "Bật Dịch Chuyển"
+toggleButton.Text = "Bật Dịch Chuyển Liên Tục"
 toggleButton.Font = Enum.Font.SourceSansBold
 toggleButton.TextSize = 18
 toggleButton.Parent = frame
@@ -75,6 +86,31 @@ closeButton.Text = "❌ Đóng GUI"
 closeButton.Font = Enum.Font.SourceSansBold
 closeButton.TextSize = 18
 closeButton.Parent = frame
+
+-- Nút Ẩn GUI
+local hideGuiButton = Instance.new("TextButton")
+hideGuiButton.Size = UDim2.new(1, -20, 0, 30)
+hideGuiButton.Position = UDim2.new(0, 10, 1, -150)
+hideGuiButton.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
+hideGuiButton.TextColor3 = Color3.new(1, 1, 1)
+hideGuiButton.Text = "Ẩn GUI"
+hideGuiButton.Font = Enum.Font.SourceSansBold
+hideGuiButton.TextSize = 16
+hideGuiButton.Parent = frame
+
+-- Nút Hiện GUI (ẩn ban đầu)
+local showGuiButton = Instance.new("TextButton")
+showGuiButton.Size = UDim2.new(0, 120, 0, 30)
+showGuiButton.Position = UDim2.new(0, 10, 0, 10)
+showGuiButton.BackgroundColor3 = Color3.fromRGB(70, 70, 200)
+showGuiButton.TextColor3 = Color3.new(1, 1, 1)
+showGuiButton.Text = "Hiện GUI"
+showGuiButton.Font = Enum.Font.SourceSansBold
+showGuiButton.TextSize = 16
+showGuiButton.Visible = false
+showGuiButton.Parent = gui
+showGuiButton.Active = true
+showGuiButton.Draggable = true
 
 -- Hàm cập nhật danh sách người chơi
 local function updatePlayerList()
@@ -117,22 +153,36 @@ refreshButton.MouseButton1Click:Connect(function()
     print("Đã làm mới danh sách người chơi.")
 end)
 
--- Nút bật/tắt dịch chuyển
+-- Nút dịch chuyển 1 lần
+teleportOnceButton.MouseButton1Click:Connect(function()
+    if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        local targetPos = targetPlayer.Character.HumanoidRootPart.CFrame
+        local character = LocalPlayer.Character
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            character.HumanoidRootPart.CFrame = targetPos * CFrame.new(0, 3, 0)
+            print("Dịch chuyển 1 lần đến:", targetPlayer.Name)
+        end
+    else
+        warn("Vui lòng chọn người chơi hợp lệ để dịch chuyển.")
+    end
+end)
+
+-- Nút bật/tắt dịch chuyển liên tục
 toggleButton.MouseButton1Click:Connect(function()
     if teleportEnabled then
         teleportEnabled = false
-        toggleButton.Text = "Bật Dịch Chuyển"
+        toggleButton.Text = "Bật Dịch Chuyển Liên Tục"
         toggleButton.BackgroundColor3 = Color3.fromRGB(60, 180, 60)
-        print("Tắt dịch chuyển.")
+        print("Tắt dịch chuyển liên tục.")
     else
         if not targetPlayer then
-            warn("Vui lòng chọn người chơi trước khi bật dịch chuyển.")
+            warn("Vui lòng chọn người chơi trước khi bật dịch chuyển liên tục.")
             return
         end
         teleportEnabled = true
-        toggleButton.Text = "Tắt Dịch Chuyển"
+        toggleButton.Text = "Tắt Dịch Chuyển Liên Tục"
         toggleButton.BackgroundColor3 = Color3.fromRGB(180, 60, 60)
-        print("Bật dịch chuyển đến:", targetPlayer.Name)
+        print("Bật dịch chuyển liên tục đến:", targetPlayer.Name)
     end
 end)
 
@@ -141,6 +191,17 @@ closeButton.MouseButton1Click:Connect(function()
     teleportEnabled = false
     gui:Destroy()
     print("Đã đóng GUI.")
+end)
+
+-- Nút ẩn/hiện GUI
+hideGuiButton.MouseButton1Click:Connect(function()
+    frame.Visible = false
+    showGuiButton.Visible = true
+end)
+
+showGuiButton.MouseButton1Click:Connect(function()
+    frame.Visible = true
+    showGuiButton.Visible = false
 end)
 
 -- Dịch chuyển liên tục
