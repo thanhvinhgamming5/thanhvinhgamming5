@@ -12,209 +12,195 @@ gui.ResetOnSpawn = false
 gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 300, 0, 350)
+frame.Size = UDim2.new(0, 320, 0, 420)
 frame.Position = UDim2.new(0, 20, 0.3, 0)
-frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 frame.BorderSizePixel = 0
 frame.Active = true
 frame.Draggable = true
 frame.Parent = gui
 
+local uiCorner = Instance.new("UICorner", frame)
+uiCorner.CornerRadius = UDim.new(0, 10)
+
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 30)
+title.Size = UDim2.new(1, 0, 0, 40)
 title.BackgroundTransparency = 1
 title.Text = "Auto Teleport Player"
-title.TextColor3 = Color3.new(1, 1, 1)
-title.Font = Enum.Font.SourceSansBold
-title.TextSize = 22
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 20
 title.Parent = frame
 
+local refreshButton = Instance.new("TextButton")
+refreshButton.Size = UDim2.new(1, -20, 0, 35)
+refreshButton.Position = UDim2.new(0, 10, 0, 45)
+refreshButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+refreshButton.TextColor3 = Color3.new(1, 1, 1)
+refreshButton.Text = "🔄 Làm Mới Danh Sách"
+refreshButton.Font = Enum.Font.Gotham
+refreshButton.TextSize = 16
+refreshButton.Parent = frame
+Instance.new("UICorner", refreshButton).CornerRadius = UDim.new(0, 8)
+
 local playerList = Instance.new("ScrollingFrame")
-playerList.Size = UDim2.new(1, -20, 0, 150)
-playerList.Position = UDim2.new(0, 10, 0, 40)
-playerList.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+playerList.Size = UDim2.new(1, -20, 0, 180)
+playerList.Position = UDim2.new(0, 10, 0, 90)
+playerList.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 playerList.BorderSizePixel = 0
 playerList.CanvasSize = UDim2.new(0, 0, 0, 0)
-playerList.ScrollBarThickness = 6
+playerList.ScrollBarThickness = 4
 playerList.Parent = frame
+Instance.new("UICorner", playerList).CornerRadius = UDim.new(0, 6)
 
 local uiListLayout = Instance.new("UIListLayout")
 uiListLayout.Parent = playerList
 uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 uiListLayout.Padding = UDim.new(0, 5)
 
--- Nút Refresh Danh Sách
-local refreshButton = Instance.new("TextButton")
-refreshButton.Size = UDim2.new(1, -20, 0, 30)
-refreshButton.Position = UDim2.new(0, 10, 0, 195)
-refreshButton.BackgroundColor3 = Color3.fromRGB(100, 100, 200)
-refreshButton.TextColor3 = Color3.new(1, 1, 1)
-refreshButton.Text = "🔄 Refresh Danh Sách"
-refreshButton.Font = Enum.Font.SourceSansBold
-refreshButton.TextSize = 16
-refreshButton.Parent = frame
-
--- Nút dịch chuyển 1 lần
 local teleportOnceButton = Instance.new("TextButton")
 teleportOnceButton.Size = UDim2.new(1, -20, 0, 40)
-teleportOnceButton.Position = UDim2.new(0, 10, 1, -110)
-teleportOnceButton.BackgroundColor3 = Color3.fromRGB(80, 160, 80)
+teleportOnceButton.Position = UDim2.new(0, 10, 0, 280)
+teleportOnceButton.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
 teleportOnceButton.TextColor3 = Color3.new(1, 1, 1)
-teleportOnceButton.Text = "Dịch chuyển 1 lần"
-teleportOnceButton.Font = Enum.Font.SourceSansBold
+teleportOnceButton.Text = "Dịch Chuyển 1 Lần"
+teleportOnceButton.Font = Enum.Font.GothamBold
 teleportOnceButton.TextSize = 18
 teleportOnceButton.Parent = frame
+Instance.new("UICorner", teleportOnceButton).CornerRadius = UDim.new(0, 8)
 
--- Nút bật/tắt dịch chuyển liên tục
 local toggleButton = Instance.new("TextButton")
 toggleButton.Size = UDim2.new(1, -20, 0, 40)
-toggleButton.Position = UDim2.new(0, 10, 1, -60)
+toggleButton.Position = UDim2.new(0, 10, 0, 330)
 toggleButton.BackgroundColor3 = Color3.fromRGB(60, 180, 60)
 toggleButton.TextColor3 = Color3.new(1, 1, 1)
 toggleButton.Text = "Bật Dịch Chuyển Liên Tục"
-toggleButton.Font = Enum.Font.SourceSansBold
+toggleButton.Font = Enum.Font.GothamBold
 toggleButton.TextSize = 18
 toggleButton.Parent = frame
+Instance.new("UICorner", toggleButton).CornerRadius = UDim.new(0, 8)
 
--- Nút Đóng GUI
-local closeButton = Instance.new("TextButton")
-closeButton.Size = UDim2.new(1, -20, 0, 30)
-closeButton.Position = UDim2.new(0, 10, 1, -25)
-closeButton.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
-closeButton.TextColor3 = Color3.new(1, 1, 1)
-closeButton.Text = "❌ Đóng GUI"
-closeButton.Font = Enum.Font.SourceSansBold
-closeButton.TextSize = 18
-closeButton.Parent = frame
-
--- Nút Ẩn GUI
 local hideGuiButton = Instance.new("TextButton")
-hideGuiButton.Size = UDim2.new(1, -20, 0, 30)
-hideGuiButton.Position = UDim2.new(0, 10, 1, -150)
-hideGuiButton.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
+hideGuiButton.Size = UDim2.new(0.48, -15, 0, 30)
+hideGuiButton.Position = UDim2.new(0, 10, 1, -35)
+hideGuiButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
 hideGuiButton.TextColor3 = Color3.new(1, 1, 1)
 hideGuiButton.Text = "Ẩn GUI"
-hideGuiButton.Font = Enum.Font.SourceSansBold
-hideGuiButton.TextSize = 16
+hideGuiButton.Font = Enum.Font.Gotham
+hideGuiButton.TextSize = 14
 hideGuiButton.Parent = frame
+Instance.new("UICorner", hideGuiButton).CornerRadius = UDim.new(0, 6)
 
--- Nút Hiện GUI (ẩn ban đầu)
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0.48, -15, 0, 30)
+closeButton.Position = UDim2.new(0.52, 5, 1, -35)
+closeButton.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
+closeButton.TextColor3 = Color3.new(1, 1, 1)
+closeButton.Text = "❌ Đóng"
+closeButton.Font = Enum.Font.Gotham
+closeButton.TextSize = 14
+closeButton.Parent = frame
+Instance.new("UICorner", closeButton).CornerRadius = UDim.new(0, 6)
+
 local showGuiButton = Instance.new("TextButton")
-showGuiButton.Size = UDim2.new(0, 120, 0, 30)
+showGuiButton.Size = UDim2.new(0, 130, 0, 30)
 showGuiButton.Position = UDim2.new(0, 10, 0, 10)
 showGuiButton.BackgroundColor3 = Color3.fromRGB(70, 70, 200)
 showGuiButton.TextColor3 = Color3.new(1, 1, 1)
 showGuiButton.Text = "Hiện GUI"
-showGuiButton.Font = Enum.Font.SourceSansBold
+showGuiButton.Font = Enum.Font.GothamBold
 showGuiButton.TextSize = 16
 showGuiButton.Visible = false
 showGuiButton.Parent = gui
 showGuiButton.Active = true
 showGuiButton.Draggable = true
+Instance.new("UICorner", showGuiButton).CornerRadius = UDim.new(0, 8)
 
 -- Hàm cập nhật danh sách người chơi
 local function updatePlayerList()
-    for _, child in pairs(playerList:GetChildren()) do
-        if child:IsA("TextButton") then
-            child:Destroy()
-        end
-    end
+	for _, child in ipairs(playerList:GetChildren()) do
+		if child:IsA("TextButton") then
+			child:Destroy()
+		end
+	end
 
-    for _, player in pairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer then
-            local btn = Instance.new("TextButton")
-            btn.Size = UDim2.new(1, -10, 0, 30)
-            btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-            btn.TextColor3 = Color3.new(1, 1, 1)
-            btn.Font = Enum.Font.SourceSans
-            btn.TextSize = 16
-            btn.Text = player.Name
-            btn.Parent = playerList
+	for _, player in ipairs(Players:GetPlayers()) do
+		if player ~= LocalPlayer then
+			local btn = Instance.new("TextButton")
+			btn.Size = UDim2.new(1, -10, 0, 30)
+			btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+			btn.TextColor3 = Color3.new(1, 1, 1)
+			btn.Font = Enum.Font.Gotham
+			btn.TextSize = 14
+			btn.Text = player.Name
+			btn.Parent = playerList
+			Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
 
-            btn.MouseButton1Click:Connect(function()
-                targetPlayer = player
-                print("Đã chọn:", player.Name)
-            end)
-        end
-    end
+			btn.MouseButton1Click:Connect(function()
+				targetPlayer = player
+				print("Đã chọn:", player.Name)
+			end)
+		end
+	end
 
-    local layout = playerList:FindFirstChildOfClass("UIListLayout")
-    if layout then
-        playerList.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 10)
-    end
+	playerList.CanvasSize = UDim2.new(0, 0, 0, uiListLayout.AbsoluteContentSize.Y + 10)
 end
 
--- Gọi khi mới vào
 updatePlayerList()
+refreshButton.MouseButton1Click:Connect(updatePlayerList)
 
--- Sự kiện nút Refresh
-refreshButton.MouseButton1Click:Connect(function()
-    updatePlayerList()
-    print("Đã làm mới danh sách người chơi.")
-end)
-
--- Nút dịch chuyển 1 lần
 teleportOnceButton.MouseButton1Click:Connect(function()
-    if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        local targetPos = targetPlayer.Character.HumanoidRootPart.CFrame
-        local character = LocalPlayer.Character
-        if character and character:FindFirstChild("HumanoidRootPart") then
-            character.HumanoidRootPart.CFrame = targetPos * CFrame.new(0, 3, 0)
-            print("Dịch chuyển 1 lần đến:", targetPlayer.Name)
-        end
-    else
-        warn("Vui lòng chọn người chơi hợp lệ để dịch chuyển.")
-    end
+	if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+		local targetPos = targetPlayer.Character.HumanoidRootPart.CFrame
+		local character = LocalPlayer.Character
+		if character and character:FindFirstChild("HumanoidRootPart") then
+			character.HumanoidRootPart.CFrame = targetPos * CFrame.new(0, 3, 0)
+		end
+	else
+		warn("Vui lòng chọn người chơi hợp lệ để dịch chuyển.")
+	end
 end)
 
--- Nút bật/tắt dịch chuyển liên tục
 toggleButton.MouseButton1Click:Connect(function()
-    if teleportEnabled then
-        teleportEnabled = false
-        toggleButton.Text = "Bật Dịch Chuyển Liên Tục"
-        toggleButton.BackgroundColor3 = Color3.fromRGB(60, 180, 60)
-        print("Tắt dịch chuyển liên tục.")
-    else
-        if not targetPlayer then
-            warn("Vui lòng chọn người chơi trước khi bật dịch chuyển liên tục.")
-            return
-        end
-        teleportEnabled = true
-        toggleButton.Text = "Tắt Dịch Chuyển Liên Tục"
-        toggleButton.BackgroundColor3 = Color3.fromRGB(180, 60, 60)
-        print("Bật dịch chuyển liên tục đến:", targetPlayer.Name)
-    end
+	if teleportEnabled then
+		teleportEnabled = false
+		toggleButton.Text = "Bật Dịch Chuyển Liên Tục"
+		toggleButton.BackgroundColor3 = Color3.fromRGB(60, 180, 60)
+	else
+		if not targetPlayer then
+			warn("Vui lòng chọn người chơi trước.")
+			return
+		end
+		teleportEnabled = true
+		toggleButton.Text = "Tắt Dịch Chuyển Liên Tục"
+		toggleButton.BackgroundColor3 = Color3.fromRGB(180, 60, 60)
+	end
 end)
 
--- Nút đóng GUI
 closeButton.MouseButton1Click:Connect(function()
-    teleportEnabled = false
-    gui:Destroy()
-    print("Đã đóng GUI.")
+	teleportEnabled = false
+	gui:Destroy()
 end)
 
--- Nút ẩn/hiện GUI
 hideGuiButton.MouseButton1Click:Connect(function()
-    frame.Visible = false
-    showGuiButton.Visible = true
+	frame.Visible = false
+	showGuiButton.Visible = true
 end)
 
 showGuiButton.MouseButton1Click:Connect(function()
-    frame.Visible = true
-    showGuiButton.Visible = false
+	frame.Visible = true
+	showGuiButton.Visible = false
 end)
 
--- Dịch chuyển liên tục
 RunService.RenderStepped:Connect(function()
-    if teleportEnabled and targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        local targetPos = targetPlayer.Character.HumanoidRootPart.CFrame
-        local character = LocalPlayer.Character
-        if character and character:FindFirstChild("HumanoidRootPart") then
-            character.HumanoidRootPart.CFrame = targetPos * CFrame.new(0, 3, 0)
-        end
-    end
+	if teleportEnabled and targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+		local targetPos = targetPlayer.Character.HumanoidRootPart.CFrame
+		local character = LocalPlayer.Character
+		if character and character:FindFirstChild("HumanoidRootPart") then
+			character.HumanoidRootPart.CFrame = targetPos * CFrame.new(0, 3, 0)
+		end
+	end
 end)
 
--- Tự động cập nhật khi người chơi vào/ra
 Players.PlayerAdded:Connect(updatePlayerList)
 Players.PlayerRemoving:Connect(updatePlayerList)
