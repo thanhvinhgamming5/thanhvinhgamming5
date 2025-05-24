@@ -5,14 +5,14 @@ local LocalPlayer = Players.LocalPlayer
 local teleportEnabled = false
 local targetPlayer = nil
 
--- Tạo GUI
+-- Tạo GUI kiểu app PC với thanh title có nút thu nhỏ (minimize) và đóng (close)
 local gui = Instance.new("ScreenGui")
 gui.Name = "AutoTeleportGui"
 gui.ResetOnSpawn = false
 gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 320, 0, 420)
+frame.Size = UDim2.new(0, 320, 0, 380)
 frame.Position = UDim2.new(0, 20, 0.3, 0)
 frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 frame.BorderSizePixel = 0
@@ -23,34 +23,78 @@ frame.Parent = gui
 local uiCorner = Instance.new("UICorner", frame)
 uiCorner.CornerRadius = UDim.new(0, 10)
 
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 40)
-title.BackgroundTransparency = 1
-title.Text = "Auto Teleport Player"
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.Font = Enum.Font.GothamBold
-title.TextSize = 20
-title.Parent = frame
+-- Thanh title (title bar)
+local titleBar = Instance.new("Frame")
+titleBar.Size = UDim2.new(1, 0, 0, 35)
+titleBar.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+titleBar.BorderSizePixel = 0
+titleBar.Parent = frame
+titleBar.ClipsDescendants = true
+
+local uiCornerTitle = Instance.new("UICorner", titleBar)
+uiCornerTitle.CornerRadius = UDim.new(0, 10)
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(1, -80, 1, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "Auto Teleport Player"
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.Font = Enum.Font.GothamBold
+titleLabel.TextSize = 18
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.Position = UDim2.new(0, 10, 0, 0)
+titleLabel.Parent = titleBar
+
+-- Nút Thu nhỏ (Minimize)
+local minimizeButton = Instance.new("TextButton")
+minimizeButton.Size = UDim2.new(0, 35, 1, 0)
+minimizeButton.Position = UDim2.new(1, -80, 0, 0)
+minimizeButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+minimizeButton.TextColor3 = Color3.new(1, 1, 1)
+minimizeButton.Text = "─"
+minimizeButton.Font = Enum.Font.GothamBold
+minimizeButton.TextSize = 24
+minimizeButton.Parent = titleBar
+Instance.new("UICorner", minimizeButton).CornerRadius = UDim.new(0, 6)
+
+-- Nút Đóng (Close)
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 35, 1, 0)
+closeButton.Position = UDim2.new(1, -40, 0, 0)
+closeButton.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
+closeButton.TextColor3 = Color3.new(1, 1, 1)
+closeButton.Text = "✕"
+closeButton.Font = Enum.Font.GothamBold
+closeButton.TextSize = 20
+closeButton.Parent = titleBar
+Instance.new("UICorner", closeButton).CornerRadius = UDim.new(0, 6)
+
+-- Nội dung chính bên dưới titleBar
+local contentFrame = Instance.new("Frame")
+contentFrame.Size = UDim2.new(1, 0, 1, -35)
+contentFrame.Position = UDim2.new(0, 0, 0, 35)
+contentFrame.BackgroundTransparency = 1
+contentFrame.Parent = frame
 
 local refreshButton = Instance.new("TextButton")
 refreshButton.Size = UDim2.new(1, -20, 0, 35)
-refreshButton.Position = UDim2.new(0, 10, 0, 45)
+refreshButton.Position = UDim2.new(0, 10, 0, 10)
 refreshButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 refreshButton.TextColor3 = Color3.new(1, 1, 1)
 refreshButton.Text = "🔄 Làm Mới Danh Sách"
 refreshButton.Font = Enum.Font.Gotham
 refreshButton.TextSize = 16
-refreshButton.Parent = frame
+refreshButton.Parent = contentFrame
 Instance.new("UICorner", refreshButton).CornerRadius = UDim.new(0, 8)
 
 local playerList = Instance.new("ScrollingFrame")
 playerList.Size = UDim2.new(1, -20, 0, 180)
-playerList.Position = UDim2.new(0, 10, 0, 90)
+playerList.Position = UDim2.new(0, 10, 0, 55)
 playerList.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 playerList.BorderSizePixel = 0
 playerList.CanvasSize = UDim2.new(0, 0, 0, 0)
 playerList.ScrollBarThickness = 4
-playerList.Parent = frame
+playerList.Parent = contentFrame
 Instance.new("UICorner", playerList).CornerRadius = UDim.new(0, 6)
 
 local uiListLayout = Instance.new("UIListLayout")
@@ -60,61 +104,25 @@ uiListLayout.Padding = UDim.new(0, 5)
 
 local teleportOnceButton = Instance.new("TextButton")
 teleportOnceButton.Size = UDim2.new(1, -20, 0, 40)
-teleportOnceButton.Position = UDim2.new(0, 10, 0, 280)
+teleportOnceButton.Position = UDim2.new(0, 10, 0, 245)
 teleportOnceButton.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
 teleportOnceButton.TextColor3 = Color3.new(1, 1, 1)
 teleportOnceButton.Text = "Dịch Chuyển 1 Lần"
 teleportOnceButton.Font = Enum.Font.GothamBold
 teleportOnceButton.TextSize = 18
-teleportOnceButton.Parent = frame
+teleportOnceButton.Parent = contentFrame
 Instance.new("UICorner", teleportOnceButton).CornerRadius = UDim.new(0, 8)
 
 local toggleButton = Instance.new("TextButton")
 toggleButton.Size = UDim2.new(1, -20, 0, 40)
-toggleButton.Position = UDim2.new(0, 10, 0, 330)
+toggleButton.Position = UDim2.new(0, 10, 0, 295)
 toggleButton.BackgroundColor3 = Color3.fromRGB(60, 180, 60)
 toggleButton.TextColor3 = Color3.new(1, 1, 1)
 toggleButton.Text = "Bật Dịch Chuyển Liên Tục"
 toggleButton.Font = Enum.Font.GothamBold
 toggleButton.TextSize = 18
-toggleButton.Parent = frame
+toggleButton.Parent = contentFrame
 Instance.new("UICorner", toggleButton).CornerRadius = UDim.new(0, 8)
-
-local hideGuiButton = Instance.new("TextButton")
-hideGuiButton.Size = UDim2.new(0.48, -15, 0, 30)
-hideGuiButton.Position = UDim2.new(0, 10, 1, -35)
-hideGuiButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-hideGuiButton.TextColor3 = Color3.new(1, 1, 1)
-hideGuiButton.Text = "Ẩn GUI"
-hideGuiButton.Font = Enum.Font.Gotham
-hideGuiButton.TextSize = 14
-hideGuiButton.Parent = frame
-Instance.new("UICorner", hideGuiButton).CornerRadius = UDim.new(0, 6)
-
-local closeButton = Instance.new("TextButton")
-closeButton.Size = UDim2.new(0.48, -15, 0, 30)
-closeButton.Position = UDim2.new(0.52, 5, 1, -35)
-closeButton.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
-closeButton.TextColor3 = Color3.new(1, 1, 1)
-closeButton.Text = "❌ Đóng"
-closeButton.Font = Enum.Font.Gotham
-closeButton.TextSize = 14
-closeButton.Parent = frame
-Instance.new("UICorner", closeButton).CornerRadius = UDim.new(0, 6)
-
-local showGuiButton = Instance.new("TextButton")
-showGuiButton.Size = UDim2.new(0, 130, 0, 30)
-showGuiButton.Position = UDim2.new(0, 10, 0, 10)
-showGuiButton.BackgroundColor3 = Color3.fromRGB(70, 70, 200)
-showGuiButton.TextColor3 = Color3.new(1, 1, 1)
-showGuiButton.Text = "Hiện GUI"
-showGuiButton.Font = Enum.Font.GothamBold
-showGuiButton.TextSize = 16
-showGuiButton.Visible = false
-showGuiButton.Parent = gui
-showGuiButton.Active = true
-showGuiButton.Draggable = true
-Instance.new("UICorner", showGuiButton).CornerRadius = UDim.new(0, 8)
 
 -- Hàm cập nhật danh sách người chơi
 local function updatePlayerList()
@@ -177,19 +185,19 @@ toggleButton.MouseButton1Click:Connect(function()
 	end
 end)
 
+minimizeButton.MouseButton1Click:Connect(function()
+	if contentFrame.Visible then
+		contentFrame.Visible = false
+		frame.Size = UDim2.new(0, 320, 0, 35) -- chỉ hiện thanh title bar
+	else
+		contentFrame.Visible = true
+		frame.Size = UDim2.new(0, 320, 0, 380)
+	end
+end)
+
 closeButton.MouseButton1Click:Connect(function()
 	teleportEnabled = false
 	gui:Destroy()
-end)
-
-hideGuiButton.MouseButton1Click:Connect(function()
-	frame.Visible = false
-	showGuiButton.Visible = true
-end)
-
-showGuiButton.MouseButton1Click:Connect(function()
-	frame.Visible = true
-	showGuiButton.Visible = false
 end)
 
 RunService.RenderStepped:Connect(function()
