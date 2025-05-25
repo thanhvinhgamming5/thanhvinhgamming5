@@ -6,7 +6,7 @@ local teleportEnabled = false
 local targetPlayer = nil
 local lockedPlayers = {}
 
--- GUI
+-- Tạo GUI
 local gui = Instance.new("ScreenGui")
 gui.Name = "AutoTeleportGui"
 gui.ResetOnSpawn = false
@@ -20,10 +20,8 @@ frame.BorderSizePixel = 0
 frame.Active = true
 frame.Draggable = true
 frame.Parent = gui
-
 Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
 
--- Title Bar
 local titleBar = Instance.new("Frame")
 titleBar.Size = UDim2.new(1, 0, 0, 35)
 titleBar.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
@@ -65,7 +63,6 @@ closeButton.TextSize = 20
 closeButton.Parent = titleBar
 Instance.new("UICorner", closeButton).CornerRadius = UDim.new(0, 6)
 
--- Content Frame
 local contentFrame = Instance.new("Frame")
 contentFrame.Size = UDim2.new(1, 0, 1, -35)
 contentFrame.Position = UDim2.new(0, 0, 0, 35)
@@ -120,7 +117,6 @@ toggleButton.TextSize = 18
 toggleButton.Parent = contentFrame
 Instance.new("UICorner", toggleButton).CornerRadius = UDim.new(0, 8)
 
--- Cập nhật danh sách người chơi
 local function updatePlayerList()
 	for _, child in ipairs(playerList:GetChildren()) do
 		if child:IsA("Frame") then
@@ -130,55 +126,41 @@ local function updatePlayerList()
 
 	for _, player in ipairs(Players:GetPlayers()) do
 		if player ~= LocalPlayer then
-			local entryFrame = Instance.new("Frame")
-			entryFrame.Size = UDim2.new(1, -10, 0, 30)
-			entryFrame.BackgroundTransparency = 1
-			entryFrame.Parent = playerList
+			local container = Instance.new("Frame")
+			container.Size = UDim2.new(1, 0, 0, 30)
+			container.BackgroundTransparency = 1
+			container.Parent = playerList
 
-			local nameButton = Instance.new("TextButton")
-			nameButton.Size = UDim2.new(1, -50, 1, 0)
-			nameButton.Position = UDim2.new(0, 0, 0, 0)
-			nameButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-			nameButton.TextColor3 = Color3.new(1, 1, 1)
-			nameButton.Font = Enum.Font.Gotham
-			nameButton.TextSize = 14
-			nameButton.Text = player.Name
-			nameButton.Parent = entryFrame
-			Instance.new("UICorner", nameButton).CornerRadius = UDim.new(0, 6)
+			local btn = Instance.new("TextButton")
+			btn.Size = UDim2.new(1, -40, 1, 0)
+			btn.Position = UDim2.new(0, 0, 0, 0)
+			btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+			btn.TextColor3 = Color3.new(1, 1, 1)
+			btn.Font = Enum.Font.Gotham
+			btn.TextSize = 14
+			btn.Text = player.Name
+			btn.Parent = container
+			Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
 
-			local lockButton = Instance.new("TextButton")
-			lockButton.Size = UDim2.new(0, 40, 1, 0)
-			lockButton.Position = UDim2.new(1, -40, 0, 0)
-			lockButton.BackgroundColor3 = lockedPlayers[player.Name] and Color3.fromRGB(180, 50, 50) or Color3.fromRGB(50, 130, 250)
-			lockButton.TextColor3 = Color3.new(1, 1, 1)
-			lockButton.Font = Enum.Font.GothamBold
-			lockButton.TextSize = 14
-			lockButton.Text = lockedPlayers[player.Name] and "🔒" or "🔓"
-			lockButton.Parent = entryFrame
-			Instance.new("UICorner", lockButton).CornerRadius = UDim.new(0, 6)
+			local lockBtn = Instance.new("TextButton")
+			lockBtn.Size = UDim2.new(0, 30, 1, 0)
+			lockBtn.Position = UDim2.new(1, -30, 0, 0)
+			lockBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+			lockBtn.TextColor3 = Color3.new(1, 1, 1)
+			lockBtn.Text = lockedPlayers[player.Name] and "🔒" or "🔓"
+			lockBtn.Font = Enum.Font.Gotham
+			lockBtn.TextSize = 14
+			lockBtn.Parent = container
+			Instance.new("UICorner", lockBtn).CornerRadius = UDim.new(0, 6)
 
-			lockButton.MouseButton1Click:Connect(function()
-				if lockedPlayers[player.Name] then
-					lockedPlayers[player.Name] = nil
-					lockButton.Text = "🔓"
-					lockButton.BackgroundColor3 = Color3.fromRGB(50, 130, 250)
-				else
-					lockedPlayers[player.Name] = true
-					lockButton.Text = "🔒"
-					lockButton.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
-					if targetPlayer == player then
-						targetPlayer = nil
-					end
-				end
+			btn.MouseButton1Click:Connect(function()
+				targetPlayer = player
+				print("Đã chọn:", player.Name)
 			end)
 
-			nameButton.MouseButton1Click:Connect(function()
-				if not lockedPlayers[player.Name] then
-					targetPlayer = player
-					print("Đã chọn:", player.Name)
-				else
-					warn("Người chơi này đã bị khóa.")
-				end
+			lockBtn.MouseButton1Click:Connect(function()
+				lockedPlayers[player.Name] = not lockedPlayers[player.Name]
+				lockBtn.Text = lockedPlayers[player.Name] and "🔒" or "🔓"
 			end)
 		end
 	end
@@ -186,16 +168,15 @@ local function updatePlayerList()
 	playerList.CanvasSize = UDim2.new(0, 0, 0, uiListLayout.AbsoluteContentSize.Y + 10)
 end
 
--- Kết nối các nút
-updatePlayerList()
 refreshButton.MouseButton1Click:Connect(updatePlayerList)
+updatePlayerList()
 
 teleportOnceButton.MouseButton1Click:Connect(function()
 	if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
 		local targetPos = targetPlayer.Character.HumanoidRootPart.CFrame
 		local character = LocalPlayer.Character
 		if character and character:FindFirstChild("HumanoidRootPart") then
-			character.HumanoidRootPart.CFrame = targetPos * CFrame.new(0, 3, 0)
+			character.HumanoidRootPart.CFrame = targetPos * CFrame.new(0, 0, 0)
 		end
 	else
 		warn("Vui lòng chọn người chơi hợp lệ để dịch chuyển.")
@@ -234,11 +215,33 @@ closeButton.MouseButton1Click:Connect(function()
 end)
 
 RunService.RenderStepped:Connect(function()
-	if teleportEnabled and targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
-		local targetPos = targetPlayer.Character.HumanoidRootPart.CFrame
-		local character = LocalPlayer.Character
-		if character and character:FindFirstChild("HumanoidRootPart") then
-			character.HumanoidRootPart.CFrame = targetPos * CFrame.new(0, 3, 0)
+	if teleportEnabled then
+		if not targetPlayer or not targetPlayer.Character or not targetPlayer.Character:FindFirstChild("HumanoidRootPart") or (targetPlayer.Character:FindFirstChildOfClass("Humanoid") and targetPlayer.Character:FindFirstChildOfClass("Humanoid").Health <= 0) then
+			local found = false
+			for _, player in ipairs(Players:GetPlayers()) do
+				if player ~= LocalPlayer and not lockedPlayers[player.Name] and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+					local hum = player.Character:FindFirstChildOfClass("Humanoid")
+					if hum and hum.Health > 0 then
+						targetPlayer = player
+						found = true
+						warn("Đã chuyển sang người chơi mới:", player.Name)
+						break
+					end
+				end
+			end
+			if not found then
+				warn("Không tìm thấy người chơi hợp lệ để dịch chuyển.")
+				targetPlayer = nil
+				return
+			end
+		end
+
+		if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+			local targetPos = targetPlayer.Character.HumanoidRootPart.CFrame
+			local character = LocalPlayer.Character
+			if character and character:FindFirstChild("HumanoidRootPart") then
+				character.HumanoidRootPart.CFrame = targetPos * CFrame.new(0, 0, 0)
+			end
 		end
 	end
 end)
